@@ -16,7 +16,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('backend') {
-                    sh 'docker build -t 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito .'
+                    sh 'docker build -t 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito/backend .'
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
                 script {
                     // Authenticate and push the image to ECR
                     sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 095214138254.dkr.ecr.us-east-1.amazonaws.com'
-                    sh 'docker push 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito'
+                    sh 'docker push 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito/backend'
                 }
             }
         }
