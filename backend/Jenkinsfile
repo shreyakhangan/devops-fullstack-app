@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = 'https://github.dev/shreyakhangan/devops-fullstack-app'  // Replace with your repo URL
+        REPO_URL = 'https://github.com/shreyakhangan/devops-fullstack-app.git'  // Replace with your repo URL
         DOCKER_CREDENTIALS_ID = 'ecr' // Jenkins credentials ID for ECR
     }
 
