@@ -7,6 +7,7 @@ pipeline {
         AWS_ACCOUNT_ID = credentials('ACCOUNT_ID')
         AWS_ECR_REPO_NAME = credentials('ECR_REPO1')
         AWS_DEFAULT_REGION = 'us-east-1'
+        ECR_URL = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${AWS_ECR_REPO_NAME}"
     }
 
     stages {
@@ -20,9 +21,8 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'docker system prune -f'
-                            sh 'docker container prune -f'
-                            sh 'docker build -t ${AWS_ECR_REPO_NAME} .
-                    
+                    sh 'docker container prune -f'
+                    sh 'docker build -t ${ECR_URL} .'
                 }
             }
         }
@@ -31,9 +31,8 @@ pipeline {
             steps {
                 script {
                     // Authenticate and push the image to ECR
-                    
-                    sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 095214138254.dkr.ecr.us-east-1.amazonaws.com'
-                    sh 'docker push 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito/backend'
+                    sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URL}'
+                    sh 'docker push ${ECR_URL}'
                 }
             }
         }
