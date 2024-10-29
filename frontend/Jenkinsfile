@@ -3,7 +3,10 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/shreyakhangan/devops-fullstack-app.git'  // Replace with your repo URL
+        ECR_REGISTRY = '961341543402.dkr.ecr.us-east-1.amazonaws.com'
+        IMAGE_NAME = 'techverito/frontend'
         DOCKER_CREDENTIALS_ID = 'ecr' // Jenkins credentials ID for ECR
+        AWS_REGION = 'us-east-1'
     }
 
     stages {
@@ -16,7 +19,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito/frontend .'
+                    sh "docker build -t ${ECR_REGISTRY}/${IMAGE_NAME} ."
                 }
             }
         }
@@ -24,9 +27,12 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Authenticate and push the image to ECR
-                    sh 'aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 095214138254.dkr.ecr.us-east-1.amazonaws.com'
-                    sh 'docker push 961341543402.dkr.ecr.us-east-1.amazonaws.com/techverito/frontend'
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: "${DOCKER_CREDENTIALS_ID}"]]) {
+                        // Authenticate to ECR and push the Docker image
+                        sh """
+                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+                            docker push ${ECR_REGISTRY}/${IMAGE_NAME}
+                            """
                 }
             }
         }
